@@ -1,4 +1,4 @@
-import 'dart:async'; // Import untuk Future.delayed
+import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,7 +15,11 @@ class HomeController extends GetxController {
   var iconColor1 = Rx<Color>(Colors.white);
   var showLottieAnimation = RxBool(false);
 
-  final animationDuration = Duration(seconds: 2); // Durasi animasi
+  final animationDuration = Duration(seconds: 2);
+
+  var arrowStart = Rx<Offset?>(null);
+  var arrowEnd = Rx<Offset?>(null);
+  var answerPosition = Rx<Offset?>(null);
 
   @override
   void onInit() {
@@ -25,19 +29,21 @@ class HomeController extends GetxController {
 
   void generateRandomNumbers() {
     final random = Random();
-    firstNumber.value = random.nextInt(100);
-    secondNumber.value = random.nextInt(100);
+    firstNumber.value = random.nextInt(10);
+    secondNumber.value = random.nextInt(10);
     userAnswer.value = '';
     answerColor.value = Colors.blue;
     outlineColor.value = Colors.white;
     iconColor.value = Colors.green;
     iconColor1.value = Colors.white;
     buttonIcon.value = Icons.check;
+    arrowStart.value = null;
+    arrowEnd.value = null;
 
     for (var star in starColors) {
       star.value = Colors.green;
     }
-    showLottieAnimation.value = false; // Reset animasi
+    showLottieAnimation.value = false;
   }
 
   void addNumber(String number) {
@@ -54,8 +60,8 @@ class HomeController extends GetxController {
       iconColor.value = Colors.green;
       iconColor1.value = Colors.green;
       buttonIcon.value = Icons.arrow_forward_ios_outlined;
-      showLottieAnimation.value = true; // Tampilkan animasi saat jawaban benar
-      _hideAnimationAfterDelay(); // Panggil metode untuk menyembunyikan animasi setelah delay
+      showLottieAnimation.value = true;
+      _hideAnimationAfterDelay();
     } else {
       answerColor.value = Colors.red;
       outlineColor.value = Colors.red;
@@ -68,7 +74,7 @@ class HomeController extends GetxController {
 
   void _hideAnimationAfterDelay() {
     Future.delayed(animationDuration, () {
-      showLottieAnimation.value = false; // Sembunyikan animasi setelah durasi
+      showLottieAnimation.value = false;
     });
   }
 
@@ -87,5 +93,30 @@ class HomeController extends GetxController {
     } else {
       checkAnswer();
     }
+  }
+
+  void updateArrow(Offset position) {
+    if (arrowStart.value == null) {
+      arrowStart.value = position;
+    }
+    if (answerPosition.value != null) {
+      arrowEnd.value = answerPosition.value!;
+    } else {
+      arrowEnd.value = position;
+    }
+  }
+
+  void hideArrow() {
+    arrowStart.value = null;
+    arrowEnd.value = null;
+  }
+
+  void setAnswerPosition(Offset position) {
+    answerPosition.value = position;
+  }
+
+  void addNumberToAnswer() {
+    // Fungsi ini digunakan untuk menambahkan angka ke jawaban
+    checkAnswer();
   }
 }
